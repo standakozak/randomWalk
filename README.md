@@ -1,1 +1,1 @@
-"# randomWalk" 
+Matplotlib visualization of random walk
