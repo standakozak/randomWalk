@@ -1,31 +1,52 @@
 import matplotlib.pyplot as plt
+import matplotlib.animation as animation
 import random
 
-plt.style.use("seaborn-whitegrid")
+#plt.style.use("seaborn-whitegrid")
+plt.xkcd()
 
+# Possible directions for step
 direction_choices = [
     (-1, 0), (1, 0), (0, -1), (0, 1)
     ]
 
-walks = 5
-steps = 500
+steps = 1000
+x_coor = y_coor = steps
+x_path = [x_coor]
+y_path = [y_coor]
 
-for walk_num in range(walks):
-    x_coor = y_coor = steps
+# Plot init
+fig, ax = plt.subplots()
+ax.plot(x_path, y_path, "kx")  # Start marker
+path_line, = ax.plot(x_path,y_path,"r-",linewidth=3)
+position_dot, = ax.plot(x_path, y_path, "bo", linewidth=3)
 
-    path_x = [x_coor]
-    path_y = [y_coor]
-    for _ in range(steps):
-        direction = random.choice(direction_choices)
-        x_coor += direction[0]
-        y_coor += direction[1]
 
-        path_x.append(x_coor)
-        path_y.append(y_coor)
+for _ in range(steps):  #Setting the path
+    direction = random.choice(direction_choices)
+    x_coor += direction[0]
+    y_coor += direction[1]
 
-    plt.plot(path_x, path_y, label=str(walk_num + 1))  # Plot some data on the axes.
-    plt.title("Random walk")
-    plt.xlabel("x coordinate")
-    plt.ylabel("y coordinate")
-plt.legend()
+    x_path.append(x_coor)
+    y_path.append(y_coor)
+ax.set_ylim(min(y_path) - 1, max(y_path) + 1)
+ax.set_xlim(min(x_path) - 1, max(x_path) + 1)
+
+animations = []
+
+
+def update_line(num, position, _line, dot):
+    """
+    Animation of the path
+    """
+    _line.set_data(position[0][:num + 1],position[1][:num + 1])
+    dot.set_data(position[0][num], position[1][num])
+
+    return _line, dot
+
+
+animations.append(animation.FuncAnimation(fig,update_line,steps,fargs=((x_path, y_path), path_line, position_dot),
+                                          interval=200,blit=True, repeat_delay=400))
+
+
 plt.show()
